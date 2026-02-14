@@ -33,7 +33,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for beautiful design
+# [MODIFIED] Updated CSS for better UI/UX (New card styles added)
 st.markdown("""
     <style>
     .main {
@@ -46,30 +46,71 @@ st.markdown("""
         height: 50px;
         padding-left: 20px;
         padding-right: 20px;
-        background-color: #e9ecef;
-        border-radius: 5px 5px 0 0;
+        background-color: #ffffff;
+        border-radius: 8px 8px 0 0;
+        border: 1px solid #dee2e6;
+        border-bottom: none;
     }
     .stTabs [aria-selected="true"] {
         background-color: #007bff;
         color: white;
     }
-    .metric-card {
-        background-color: white;
+
+    /* New Card Box Styles */
+    .card-box {
         padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-radius: 12px;
         margin: 10px 0;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transition: transform 0.2s;
+        height: 100%; 
     }
+    .card-box:hover {
+        transform: translateY(-5px);
+    }
+    
+    /* Objective Box - Blue Theme */
+    .objective-box {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-left: 6px solid #2196f3;
+        color: #0d47a1;
+    }
+    
+    /* Reward Box - Green Theme */
+    .reward-box {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border-left: 6px solid #4caf50;
+        color: #1b5e20;
+    }
+    
+    /* Action Box - Purple Theme */
+    .action-box {
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        border-left: 6px solid #9c27b0;
+        color: #4a148c;
+    }
+
+    /* Typography inside cards */
+    .card-box h4 {
+        margin: 0 0 10px 0;
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .card-box p {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        opacity: 0.9;
+    }
+    
+    /* Standard Status Boxes */
     .success-box {
         background-color: #d4edda;
         border-left: 5px solid #28a745;
-        padding: 15px;
-        border-radius: 5px;
-        margin: 10px 0;
-    }
-    .info-box {
-        background-color: #d1ecf1;
-        border-left: 5px solid #17a2b8;
+        color: #155724;
         padding: 15px;
         border-radius: 5px;
         margin: 10px 0;
@@ -77,18 +118,18 @@ st.markdown("""
     .warning-box {
         background-color: #fff3cd;
         border-left: 5px solid #ffc107;
+        color: #856404;
         padding: 15px;
         border-radius: 5px;
         margin: 10px 0;
     }
-    h1 {
-        color: #2c3e50;
-    }
-    h2 {
-        color: #34495e;
-    }
-    h3 {
-        color: #7f8c8d;
+    .info-box-generic {
+        background-color: #d1ecf1;
+        border-left: 5px solid #17a2b8;
+        color: #0c5460;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -426,7 +467,7 @@ def plot_training_results(rewards, positions, algorithm):
     if window > 0:
         fig.add_trace(
             go.Scatter(x=list(range(window-1, len(rewards))), y=rewards_ma,
-                      name=f'{window}-Episode MA', line=dict(color='darkred', width=2)),
+                       name=f'{window}-Episode MA', line=dict(color='darkred', width=2)),
             row=1, col=1
         )
     fig.add_hline(y=-110, line_dash="dash", line_color="green",
@@ -441,7 +482,7 @@ def plot_training_results(rewards, positions, algorithm):
     if window > 0:
         fig.add_trace(
             go.Scatter(x=list(range(window-1, len(positions))), y=positions_ma,
-                      name=f'{window}-Episode MA', line=dict(color='darkblue', width=2)),
+                       name=f'{window}-Episode MA', line=dict(color='darkblue', width=2)),
             row=2, col=1
         )
     fig.add_hline(y=0.5, line_dash="dash", line_color="green",
@@ -592,30 +633,30 @@ def main():
     # MAIN CONTENT AREA
     # ========================================================================
     
-    # Information boxes
+    # [MODIFIED] Updated HTML structure to use new card classes for better UI
     col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("""
-        <div class="info-box">
+        <div class="card-box objective-box">
             <h4>🎯 Objective</h4>
-            <p>Drive an underpowered car up a steep hill by building momentum</p>
+            <p>Drive an underpowered car up a steep hill by building momentum (swinging back and forth).</p>
         </div>
         """, unsafe_allow_html=True)
     
     with col2:
         st.markdown("""
-        <div class="info-box">
-            <h4>📈 Reward</h4>
-            <p>-1 per timestep until reaching position ≥ 0.5</p>
+        <div class="card-box reward-box">
+            <h4>📈 Reward Structure</h4>
+            <p><strong>-1</strong> per timestep.<br>Goal is to minimize negative reward (reach flag fast).</p>
         </div>
         """, unsafe_allow_html=True)
     
     with col3:
         st.markdown("""
-        <div class="info-box">
-            <h4>🎮 Actions</h4>
-            <p>Left, No Push, Right</p>
+        <div class="card-box action-box">
+            <h4>🎮 Action Space</h4>
+            <p>Discrete(3):<br>0: Accelerate Left<br>1: Don't Accelerate<br>2: Accelerate Right</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -737,13 +778,13 @@ def main():
                 if window > 0:
                     loss_ma = np.convolve(results['losses'], np.ones(window)/window, mode='valid')
                     fig.add_trace(go.Scatter(y=results['losses'], name='Loss', opacity=0.3,
-                                            line=dict(color='lightcoral')))
+                                             line=dict(color='lightcoral')))
                     fig.add_trace(go.Scatter(x=list(range(window-1, len(results['losses']))),
-                                            y=loss_ma, name=f'{window}-Episode MA',
-                                            line=dict(color='darkred', width=2)))
+                                             y=loss_ma, name=f'{window}-Episode MA',
+                                             line=dict(color='darkred', width=2)))
                 else:
                     fig.add_trace(go.Scatter(y=results['losses'], name='Loss',
-                                            line=dict(color='darkred')))
+                                             line=dict(color='darkred')))
                 
                 fig.update_layout(title="Training Loss", xaxis_title="Episode",
                                  yaxis_title="MSE Loss", height=400)
@@ -838,7 +879,7 @@ def main():
             winner = "DQN" if dqn_test['success_rate'] > ql_test['success_rate'] else "Q-Learning"
             
             st.markdown(f"""
-            <div class="info-box">
+            <div class="info-box-generic">
                 <h4>🏆 Winner: {winner}</h4>
                 <p><strong>Q-Learning:</strong> {ql_test['success_rate']:.1f}% success rate in {ql_time:.1f}s</p>
                 <p><strong>DQN:</strong> {dqn_test['success_rate']:.1f}% success rate in {dqn_time:.1f}s</p>
@@ -918,7 +959,7 @@ def main():
     st.markdown("---")
     st.markdown("""
     <div style='text-align: center; color: #7f8c8d;'>
-        <p>Built with Streamlit | <a href='https://github.com/yourusername/mountaincar-rl'>GitHub Repository</a></p>
+        <p>Built with Streamlit | <a href='https://github.com/spouladchang/Mountain-Car-RL-Optimization'>GitHub Repository</a></p>
         <p>MountainCar-v0 Environment from Gymnasium</p>
     </div>
     """, unsafe_allow_html=True)
